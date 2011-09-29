@@ -26,12 +26,12 @@ First, you need to have `git` installed and in your `$PATH`. Afterwards you may 
 ### OSX
 
     $ cd ~/Library/Application\ Support/Sublime\ Text\ 2/Packages/
-    $ git clone git://github.com/kemayo/sublime-text-2-git.git Git
+    $ git clone git://github.com/kemayo/sublime-text-2-goto-documentation.git GotoDocumentation
 
 ### Linux (Ubuntu like distros)
 
     $ cd ~/.config/sublime-text-2/Packages/
-    $ git clone git://github.com/kemayo/sublime-text-2-git.git Git
+    $ git clone git://github.com/kemayo/sublime-text-2-goto-documentation.git GotoDocumentation
 
 ### Windows 7:
 
