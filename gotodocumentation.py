@@ -90,6 +90,9 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
 
         open_url("http://docs.python.org/search.html?q=%s" % keyword)
 
+    def smarty_doc(self, keyword, scope):
+        open_url('http://www.smarty.net/%s' % keyword)
+
     def run_command(self, command, callback=None, **kwargs):
         if not callback:
             callback = self.display_output
