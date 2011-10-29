@@ -5,7 +5,11 @@ A command to jump to documentation for the current word.
 ## Supports
 
  * PHP
- * JS
+ * JS / CoffeeScript
+ * Python
+ * Clojure
+ * Go
+ * Smarty
 
 Submit a patch adding more and I'll include it.
 

@@ -80,6 +80,8 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
     def js_doc(self, keyword, scope):
         open_url("https://developer.mozilla.org/en-US/search?q=%s" % keyword)
 
+    coffee_doc = js_doc
+
     def python_doc(self, keyword, scope):
         """Not trying to be full on intellisense here, but want to make opening a
         browser to a docs.python.org search a last resort
@@ -89,6 +91,12 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
             return
 
         open_url("http://docs.python.org/search.html?q=%s" % keyword)
+
+    def clojure_doc(self, keyword, scope):
+        open_url("http://clojuredocs.org/search?x=0&y=0&q=%s" % keyword)
+
+    def go_doc(self, keyword, scope):
+        open_url("http://golang.org/search?q=%s" % keyword)
 
     def smarty_doc(self, keyword, scope):
         open_url('http://www.smarty.net/%s' % keyword)
