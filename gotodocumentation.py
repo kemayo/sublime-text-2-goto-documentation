@@ -96,7 +96,7 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
         browser to a docs.python.org search a last resort
         """
         if not re.match(r'\s', keyword):
-            self.run_command(["pydoc", keyword])
+            self.run_command(["python", "-m", "pydoc", keyword])
             return
 
         open_url("http://docs.python.org/search.html?q=%s" % keyword)
