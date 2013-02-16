@@ -56,7 +56,7 @@ class CommandThread(threading.Thread):
             # output = subprocess.check_output(self.command)
             main_thread(self.on_done,
                 _make_text_safeish(output, self.fallback_encoding))
-        except subprocess.CalledProcessError, e:
+        except subprocess.CalledProcessError as e:
             main_thread(self.on_done, e.returncode)
 
 
