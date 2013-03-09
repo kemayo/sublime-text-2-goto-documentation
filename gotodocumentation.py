@@ -20,15 +20,19 @@ def main_thread(callback, *args, **kwargs):
     sublime.set_timeout(functools.partial(callback, *args, **kwargs), 0)
 
 
-def _make_text_safeish(text, fallback_encoding):
+def _make_text_safeish(text, fallback_encoding, method='decode'):
     # The unicode decode here is because sublime converts to unicode inside
     # insert in such a way that unknown characters will cause errors, which is
     # distinctly non-ideal... and there's no way to tell what's coming out of
     # git in output. So...
     try:
-        unitext = text.decode('utf-8')
-    except UnicodeDecodeError:
-        unitext = text.decode(fallback_encoding)
+        unitext = getattr(text, method)('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        unitext = getattr(text, method)(fallback_encoding)
+    except AttributeError:
+        # strongly implies we're already unicode, but just in case let's cast
+        # to string
+        unitext = str(text)
     return unitext
 
 
@@ -52,8 +56,6 @@ class CommandThread(threading.Thread):
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 shell=shell, universal_newlines=True)
             output = proc.communicate()[0]
-            # if sublime's python gets bumped to 2.7 we can just do:
-            # output = subprocess.check_output(self.command)
             main_thread(self.on_done,
                 _make_text_safeish(output, self.fallback_encoding))
         except subprocess.CalledProcessError as e:
@@ -115,18 +117,26 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
 
     def run_command(self, command, callback=None, **kwargs):
         if not callback:
-            callback = self.display_output
+            callback = self.panel
         thread = CommandThread(command, callback, **kwargs)
         thread.start()
 
-    def display_output(self, output):
+    def panel(self, output, **kwargs):
+        active_window = sublime.active_window()
         if not hasattr(self, 'output_view'):
-            self.output_view = sublime.active_window().get_output_panel("gotodocumentation")
+            self.output_view = active_window.get_output_panel("gotodocumentation")
         self.output_view.set_read_only(False)
-        edit = self.output_view.begin_edit()
-        region = sublime.Region(0, self.output_view.size())
-        self.output_view.erase(edit, region)
-        self.output_view.insert(edit, 0, output)
-        self.output_view.end_edit(edit)
+        self.output_view.run_command('goto_documentation_output', {
+            'output': output,
+            'clear': True
+        })
         self.output_view.set_read_only(True)
-        sublime.active_window().run_command("show_panel", {"panel": "output.gotodocumentation"})
+        active_window.run_command("show_panel", {"panel": "output.gotodocumentation"})
+
+
+class GotoDocumentationOutputCommand(sublime_plugin.TextCommand):
+    def run(self, edit, output = '', output_file = None, clear = False):
+        if clear:
+            region = sublime.Region(0, self.view.size())
+            self.view.erase(edit, region)
+        self.view.insert(edit, 0, output)
