@@ -115,6 +115,9 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
     def cmake_doc(self, keyword, scope):
         open_url('http://cmake.org/cmake/help/v2.8.8/cmake.html#command:%s' % keyword.lower())
 
+    def perl_doc(self, keyword, scope):
+        open_url("http://perldoc.perl.org/search.html?q=%s" % keyword)
+
     def run_command(self, command, callback=None, **kwargs):
         if not callback:
             callback = self.panel
