@@ -69,9 +69,6 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
                 scope = self.view.scope_name(word.begin()).strip()
                 extracted_scope = scope.rpartition('.')[2]
                 keyword = self.view.substr(word)
-                # This nasty, but I don't know enough Python to express this nicely.
-                if "source.pde" in scope:
-                    extracted_scope = "processing"
                 getattr(self, '%s_doc' % extracted_scope, self.unsupported)(keyword, scope)
 
     def unsupported(self, keyword, scope):
@@ -80,7 +77,8 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
     def php_doc(self, keyword, scope):
         open_url("http://php.net/%s" % keyword)
 
-    def processing_doc(self, keyword, scope):
+    def pde_doc(self, keyword, scope):
+        """Processing (via scope.pde)"""
         open_url("http://www.processing.org/reference/%s_" % keyword + ".html")
 
     def rails_doc(self, keyword, scope):
