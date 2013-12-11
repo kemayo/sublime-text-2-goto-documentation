@@ -118,6 +118,9 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
     def perl_doc(self, keyword, scope):
         open_url("http://perldoc.perl.org/search.html?q=%s" % keyword)
 
+    def cs_doc(self, keyword, scope):
+        open_url("http://social.msdn.microsoft.com/Search/?query=%s" % keyword)
+
     def run_command(self, command, callback=None, **kwargs):
         if not callback:
             callback = self.panel
