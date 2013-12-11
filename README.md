@@ -4,6 +4,7 @@ A command to jump to documentation for the current word.
 
 ## Supports
 
+ * AHK
  * PHP
  * JS / CoffeeScript
  * Python
