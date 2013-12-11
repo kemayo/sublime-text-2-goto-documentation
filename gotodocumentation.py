@@ -86,7 +86,7 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
         open_url("http://api.rubyonrails.org/?q=%s" % keyword)
 
     def ruby_doc(self, keyword, scope):
-        open_url("http://api.rubyonrails.org/?q=%s" % keyword)
+        open_url("http://ruby-doc.com/search.html?q=%s" % keyword)
 
     def js_doc(self, keyword, scope):
         open_url("https://developer.mozilla.org/en-US/search?q=%s" % keyword)
