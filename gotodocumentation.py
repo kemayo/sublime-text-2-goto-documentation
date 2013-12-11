@@ -79,8 +79,13 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
     def php_doc(self, keyword, scope):
         open_url("http://php.net/%s" % keyword)
 
+
     def ahk_doc(self, keyword, scope):
         open_url("http://www.autohotkey.com/docs/commands/%s.htm" % keyword)
+
+    def pde_doc(self, keyword, scope):
+        """Processing (via scope.pde)"""
+        open_url("http://www.processing.org/reference/%s_" % keyword + ".html")
 
     def rails_doc(self, keyword, scope):
         open_url("http://api.rubyonrails.org/?q=%s" % keyword)
