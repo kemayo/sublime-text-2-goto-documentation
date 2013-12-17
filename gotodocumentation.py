@@ -129,6 +129,9 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
 
     def cs_doc(self, keyword, scope):
         open_url("http://social.msdn.microsoft.com/Search/?query=%s" % keyword)
+        
+    def lua_doc(self, keyword, scope):
+        open_url('http://pgl.yoyo.org/luai/i/%s' % keyword)
 
     def run_command(self, command, callback=None, **kwargs):
         if not callback:
