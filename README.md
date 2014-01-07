@@ -13,6 +13,7 @@ A command to jump to documentation for the current word.
  * Smarty
  * Ruby on Rails
  * Processing
+ * PostgreSQL
 
 Submit a patch adding more and I'll include it.
 
