@@ -81,6 +81,8 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
     def php_doc(self, keyword, scope):
         open_url("http://php.net/%s" % keyword)
 
+    def css_doc(self, keyword, scope):
+        open_url("https://developer.mozilla.org/en-US/docs/Web/CSS/%s" % keyword)
 
     def ahk_doc(self, keyword, scope):
         open_url("http://www.autohotkey.com/docs/commands/%s.htm" % keyword)
