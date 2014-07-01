@@ -1,0 +1,50 @@
+{
+    "prefix": "", // added at the begging of the query
+    "suffix": "", // added at the end of the query
+    "docs": { // obj containing the docs for each scope
+
+        // the key value pair represent scope -> doc url
+        // supported placeholders:
+        //  - %(query)s the selected text/word
+        //  - %(scope)s the current scope
+        "ahk": "http://www.autohotkey.com/docs/commands/%(query)s.htm",
+        "rails": "http://api.rubyonrails.org/?q=%(query)s",
+        "controller": "http://api.rubyonrails.org/?q=%(query)s",
+        "ruby": "http://ruby-doc.com/search.html?q=%(query)s",
+        "js": "https://developer.mozilla.org/en-US/search?q=%(query)s",
+        "coffee": "https://developer.mozilla.org/en-US/search?q=%(query)s",
+        "php": "http://php.net/manual-lookup.php?pattern=%(query)s",
+        "clojure": "http://clojuredocs.org/search?x=0&y=0&q=%(query)s",
+        "go": "http://golang.org/search?q=%(query)s",
+        "smarty": "http://www.smarty.net/%(query)s",
+        "cmake": "http://cmake.org/cmake/help/v2.8.8/cmake.html#command:%(query)s",
+        "perl": "http://perldoc.perl.org/search.html?q=%(query)s",
+        "cs": "http://social.msdn.microsoft.com/Search/?query=%(query)s",
+        "lua": "http://pgl.yoyo.org/luai/i/%(query)s",
+        "pgsql": "http://www.postgresql.org/search/?u=%%2Fdocs%%2Fcurrent%%2F&q=%(query)s",
+        "erlang": "http://erldocs.com/R16B03/?search=%(query)s",
+        "css": "http://devdocs.io/#q=%(scope)s+%(query)s",
+        "scss": "http://devdocs.io/#q=%(scope)s+%(query)s",
+        "less": "http://devdocs.io/#q=%(scope)s+%(query)s",
+
+
+        // we can also have an object to
+        // run a command for finding docs
+        // inside the command you can use the same placeholders
+        "python": {
+            // the command to be executed
+            "command": "python -m pydoc %(query)s",
+            // a regex to determine if this was an invalid response from the console
+            "failTest": ".*no Python documentation found for.*",
+            // regex to select something from the valid response
+            "changeMatch": "(Related help topics)",
+            // regex to replace the matched result
+            "changeWith": "-------\n\\1",
+            // fallback url: if failTest returns true this will be used
+            "url": "http://docs.python.org/search.html?q=%(query)s"
+        }
+    },
+    // if we have no docs for the current scope we try using google
+    "use_google": true,
+    "google_url": "https://google.com/search?q=%(scope)s+%(query)s"
+}

@@ -1,6 +1,6 @@
 [
     {
-        "caption": "Goto Documentation"
-        ,"command": "goto_documentation"
+        "caption": "Goto Documentation",
+        "command": "goto_documentation"
     }
 ]

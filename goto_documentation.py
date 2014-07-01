@@ -1,0 +1,182 @@
+# GotoDocumentation Sublime Plugin
+# Jun 2014
+
+import webbrowser
+import sublime, sublime_plugin
+import re, os
+import subprocess
+
+default_docs = {
+        "ahk": "http://www.autohotkey.com/docs/commands/%(query)s.htm",
+        "rails": "http://api.rubyonrails.org/?q=%(query)s",
+        "controller": "http://api.rubyonrails.org/?q=%(query)s",
+        "ruby": "http://ruby-doc.com/search.html?q=%(query)s",
+        "js": "https://developer.mozilla.org/en-US/search?q=%(query)s",
+        "coffee": "https://developer.mozilla.org/en-US/search?q=%(query)s",
+        "php": "http://php.net/manual-lookup.php?pattern=%(query)s",
+        "clojure": "http://clojuredocs.org/search?x=0&y=0&q=%(query)s",
+        "go": "http://golang.org/search?q=%(query)s",
+        "smarty": "http://www.smarty.net/%(query)s",
+        "cmake": "http://cmake.org/cmake/help/v2.8.8/cmake.html#command:%(query)s",
+        "perl": "http://perldoc.perl.org/search.html?q=%(query)s",
+        "cs": "http://social.msdn.microsoft.com/Search/?query=%(query)s",
+        "lua": "http://pgl.yoyo.org/luai/i/%(query)s",
+        "pgsql": "http://www.postgresql.org/search/?u=%%2Fdocs%%2Fcurrent%%2F&q=%(query)s",
+        "erlang": "http://erldocs.com/R16B03/?search=%(query)s",
+        "css": "http://devdocs.io/#q=%(scope)s+%(query)s",
+        "scss": "http://devdocs.io/#q=%(scope)s+%(query)s",
+        "less": "http://devdocs.io/#q=%(scope)s+%(query)s",
+        "python": {
+            "command": "python -m pydoc %(query)s",
+            "failTest": ".*no Python documentation found for.*",
+            "changeMatch": "(Related help topics)",
+            "changeWith": "-------\n\\1",
+            "url": "http://docs.python.org/search.html?q=%(query)s"
+        }
+}
+
+
+def combineDicts(dictionary1, dictionary2):
+    output = {}
+    for item, value in dictionary1.items():
+        if item in dictionary2:
+            if isinstance(dictionary2[item], dict):
+                output[item] = combineDicts(value, dictionary2.pop(item))
+        else:
+            output[item] = value
+    for item, value in dictionary2.items():
+         output[item] = value
+    return output
+
+
+class GotoDocumentationCommand(sublime_plugin.TextCommand):
+    """
+    Search the selected text or the current word
+    """
+    def run(self, edit):
+        # grab the word or the selection from the view
+        for region in self.view.sel():
+            if region.empty():
+
+                # if we have no selection grab the current word
+                word = self.view.word(region)
+                if not word.empty():
+                    q = self.view.substr(word)
+                    scope = self.view.scope_name(word.begin()).rpartition('.')[2].strip()
+
+                    self.open_doc(q, scope)
+
+            else:
+
+                # grab the selection
+                if not region.empty():
+                    q = self.view.substr(region)
+                    scope = self.view.scope_name(region.begin()).rpartition('.')[2]
+
+                    self.open_doc(q, scope)
+
+
+    def open_doc(self, query, scope):
+
+        settings = sublime.load_settings("goto_documentation.sublime-settings")
+
+        # attach the prefix and suffix
+        query = settings.get('prefix', '') + query + settings.get('suffix', '')
+
+        # merge the default docs with the one provided by the user
+        docs = combineDicts(default_docs, settings.get('docs'))
+
+
+        # if we have the scope defined in settings
+        # build the url and open it
+        if scope in docs:
+            doc = docs[scope]
+
+            # if it is a dict we must have:
+            #   - a command to run
+            #   - a regex to check against
+            #   - an optional fallback url
+            if type(doc) is dict:
+                # build the command
+                command = doc['command']%{'query': query, 'scope': scope}
+
+                # Per http://bugs.python.org/issue8557 shell=True
+                shell = os.name == 'nt'
+                # run it
+                process = subprocess.Popen(command, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                stdout = [x.decode('unicode_escape').rstrip() for x in process.stdout.readlines()]
+
+                stdout = '\n'.join(stdout)
+
+
+                # match the result agains the regex
+                reg = re.compile(doc['failTest'])
+                if reg.match(stdout):
+                    # use the fallback url
+                    if 'url' in doc:
+                        fullUrl = doc['url']%{'query': query, 'scope': scope}
+                        webbrowser.open(fullUrl)
+                    else:
+                        self.show_status("No docs available for the current word !")
+
+
+                else:
+                    # regex to change something before it's sent to the panel
+                    if 'changeMatch' in doc and 'changeWith' in doc:
+                        stdout = re.sub(doc['changeMatch'], doc['changeWith'], stdout)
+
+                    # we have a valid result from console
+                    # so we place it in the output panel
+                    self.panel(stdout)
+
+            else:
+                if doc:
+                    # we have an url so we build and open it
+                    fullUrl = doc%{'query': query, 'scope': scope}
+                    webbrowser.open(fullUrl)
+                else:
+                    self.show_status("This scope is disabled !")
+
+        else:
+            # we search on google if we don't have the scope
+            if settings.get('use_google', 0):
+                defUrl = "https://google.com/search?q=%(scope)s %(query)s"
+                gUrl = settings.get('google_url', defUrl)
+                webbrowser.open( gUrl% {'scope': scope, 'query': query})
+            else:
+                self.show_status("No docs available for the current scope !")
+
+    # Open and write on the output panel
+    def panel(self, output):
+        active_window = sublime.active_window()
+
+        if not hasattr(self, 'output_view'):
+            self.output_view = active_window.get_output_panel("gotodocumentation")
+
+        self.output_view.set_read_only(False)
+
+        self.output_view.run_command('goto_documentation_output', {
+            'output': output,
+            'clear': True
+        })
+
+        self.output_view.set_read_only(True)
+        active_window.run_command("show_panel", {"panel": "output.gotodocumentation"})
+
+    def show_status(self, status):
+        sublime.status_message(status)
+        print("\nGoto Documentation Plugin: " + status + "\n")
+
+
+
+
+class GotoDocumentationOutputCommand(sublime_plugin.TextCommand):
+    def run(self, edit, output = '', output_file = None, clear = False):
+
+        if clear:
+            region = sublime.Region(0, self.view.size())
+            self.view.erase(edit, region)
+
+        self.view.insert(edit, 0, output)
+
+
