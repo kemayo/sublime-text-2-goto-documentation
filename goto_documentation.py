@@ -26,28 +26,20 @@ default_docs = {
         "css": "http://devdocs.io/#q=%(scope)s+%(query)s",
         "scss": "http://devdocs.io/#q=%(scope)s+%(query)s",
         "less": "http://devdocs.io/#q=%(scope)s+%(query)s",
+        "google": "https://google.com/search?q=%(scope)s+%(query)s",
         "python": {
-            "command": "python -m pydoc %(query)s",
+            "command": ["python", "-m", "pydoc", "%(query)s"],
             "failTest": ".*no Python documentation found for.*",
             "changeMatch": "(Related help topics)",
             "changeWith": "-------\n\\1",
-            "url": "http://docs.python.org/search.html?q=%(query)s"
+            "url": "http://docs.python.org/3/search.html?q=%(query)s"
         }
 }
 
-
 def combineDicts(dictionary1, dictionary2):
-    output = {}
-    for item, value in dictionary1.items():
-        if item in dictionary2:
-            if isinstance(dictionary2[item], dict):
-                output[item] = combineDicts(value, dictionary2.pop(item))
-        else:
-            output[item] = value
-    for item, value in dictionary2.items():
-         output[item] = value
-    return output
-
+    new_dict = dictionary1.copy()
+    new_dict.update(dictionary2)
+    return new_dict
 
 class GotoDocumentationCommand(sublime_plugin.TextCommand):
     """
@@ -86,65 +78,68 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
         # merge the default docs with the one provided by the user
         docs = combineDicts(default_docs, settings.get('docs'))
 
+        # we use a temp scope so we don't replace the "real" scope
+        tscope = scope
+
+        if not tscope in docs:
+            tscope = settings.get('fallback_scope', 'google')
+
+        if not tscope in docs:
+            self.show_status("No docs available for the current scope !")
+            return
+
+
 
         # if we have the scope defined in settings
         # build the url and open it
-        if scope in docs:
-            doc = docs[scope]
+        doc = docs[tscope]
 
-            # if it is a dict we must have:
-            #   - a command to run
-            #   - a regex to check against
-            #   - an optional fallback url
-            if type(doc) is dict:
-                # build the command
-                command = doc['command']%{'query': query, 'scope': scope}
+        # if it is a dict we must have:
+        #   - a command to run
+        #   - a regex to check against
+        #   - an optional fallback url
+        if type(doc) is dict:
+            # build the command
+            command = [x%{'query': query, 'scope': scope} for x in doc['command']]
 
-                # Per http://bugs.python.org/issue8557 shell=True
-                shell = os.name == 'nt'
-                # run it
-                process = subprocess.Popen(command, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                stdout = [x.decode('unicode_escape').rstrip() for x in process.stdout.readlines()]
+            # Per http://bugs.python.org/issue8557 shell=True
+            shell = os.name == 'nt'
+            # run it
+            process = subprocess.Popen(command, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            stdout = [x.decode('unicode_escape').rstrip() for x in process.stdout.readlines()]
 
-                stdout = '\n'.join(stdout)
-
-
-                # match the result agains the regex
-                reg = re.compile(doc['failTest'])
-                if reg.match(stdout):
-                    # use the fallback url
-                    if 'url' in doc:
-                        fullUrl = doc['url']%{'query': query, 'scope': scope}
-                        webbrowser.open(fullUrl)
-                    else:
-                        self.show_status("No docs available for the current word !")
+            stdout = '\n'.join(stdout)
 
 
-                else:
-                    # regex to change something before it's sent to the panel
-                    if 'changeMatch' in doc and 'changeWith' in doc:
-                        stdout = re.sub(doc['changeMatch'], doc['changeWith'], stdout)
-
-                    # we have a valid result from console
-                    # so we place it in the output panel
-                    self.panel(stdout)
-
-            else:
-                if doc:
-                    # we have an url so we build and open it
-                    fullUrl = doc%{'query': query, 'scope': scope}
+            # match the result agains the regex
+            reg = re.compile(doc['failTest'])
+            if reg.match(stdout):
+                # use the fallback url
+                if 'url' in doc:
+                    fullUrl = doc['url']%{'query': query, 'scope': scope}
                     webbrowser.open(fullUrl)
                 else:
-                    self.show_status("This scope is disabled !")
+                    self.show_status("No docs available for the current word !")
+
+
+            else:
+                # regex to change something before it's sent to the panel
+                if 'changeMatch' in doc and 'changeWith' in doc:
+                    stdout = re.sub(doc['changeMatch'], doc['changeWith'], stdout)
+
+                # we have a valid result from console
+                # so we place it in the output panel
+                self.panel(stdout)
 
         else:
-            # we search on google if we don't have the scope
-            if settings.get('use_google', 0):
-                defUrl = "https://google.com/search?q=%(scope)s %(query)s"
-                gUrl = settings.get('google_url', defUrl)
-                webbrowser.open( gUrl% {'scope': scope, 'query': query})
-            else:
-                self.show_status("No docs available for the current scope !")
+            if not doc:
+                self.show_status("This scope is disabled !")
+                return
+
+            # we have an url so we build and open it
+            fullUrl = doc%{'query': query, 'scope': scope}
+            webbrowser.open(fullUrl)
+
 
     # Open and write on the output panel
     def panel(self, output):
