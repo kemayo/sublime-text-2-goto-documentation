@@ -42,22 +42,21 @@ Open documentation allows you to edit the url that opens when you call the open 
     "prefix": "", // added at the begging of the query
     "suffix": "", // added at the end of the query
     "docs": { // obj containing the docs for each scope
+              // these are merged with the default ones
+
 
         // the key value pair represent scope -> doc url
         // supported placeholders:
         //  - %(query)s the selected text/word
         //  - %(scope)s the current scope
-        "ahk": "http://www.autohotkey.com/docs/commands/%(query)s.htm",
-        "rails": "http://api.rubyonrails.org/?q=%(query)s",
-        "css": "http://devdocs.io/#q=%(scope)+%(query)s",
- 
+       "css": "http://devdocs.io/#q=%(scope)s+%(query)s",
 
         // we can also have an object to
         // run a command for finding docs
         // inside the command you can use the same placeholders
         "python": {
             // the command to be executed
-            "command": "python -m pydoc %(query)s",
+            "command": ["python", "-m", "pydoc", "%(query)s"],
             // a regex to determine if this was an invalid response from the console
             "failTest": ".*no Python documentation found for.*",
             // regex to select something from the valid response
@@ -65,12 +64,13 @@ Open documentation allows you to edit the url that opens when you call the open 
             // regex to replace the matched result
             "changeWith": "-------\n\\1",
             // fallback url: if failTest returns true this will be used
-            "url": "http://docs.python.org/search.html?q=%(query)s"
+            "url": "http://docs.python.org/3/search.html?q=%(query)s"
         }
     },
-    // if we have no docs for the current scope we try using google
-    "use_google": true,
-    "google_url": "https://google.com/search?q=%(scope)s+%(query)s"
+    // if we have no docs for the current scope
+    // we will try using the fallback one,
+    // to disable set to false
+    "fallback_scope": "google"
 }
 
 ```
