@@ -1,6 +1,6 @@
 GotoDocumentation
 ===========================
-A sublime text 2/3 plugin to jump to documentation for the current word.
+A Sublime Text plugin to jump to documentation for the current keyword.
 
 
 ## Supports
@@ -9,11 +9,17 @@ A sublime text 2/3 plugin to jump to documentation for the current word.
  * JS / CoffeeScript
  * HTML
  * CSS/SASS/LESS
- * Python
+ * Python (via `pydoc`)
  * Clojure
  * Go
+ * Ruby (+Rails)
+ * C / C++
+ * Perl
+ * C#
+ * Lua
+ * Postgres
+ * Erlang
  * Smarty
- * Ruby on Rails
  * ...you can add any other language via settings
 
 
@@ -35,9 +41,9 @@ Move the cursor inside the word you want the docs for and:
  * Open command palette (Ctrl+Shift+P) and search for for GotoDocumentation
 
 ## Edit the urls
-Open documentation allows you to edit the url that opens when you call the open documentation plugin by editing the settings.
+GotoDocumentation allows you to edit the url that opens by editing the settings.
 ### The available settings are:
-```javascript
+```json
 {
     "prefix": "", // added at the begging of the query
     "suffix": "", // added at the end of the query
