@@ -12,6 +12,7 @@ default_docs = {
         "controller": "http://api.rubyonrails.org/?q=%(query)s",
         "ruby": "http://ruby-doc.com/search.html?q=%(query)s",
         "js": "https://developer.mozilla.org/en-US/search?q=%(query)s&topic=js",
+        "html": "https://developer.mozilla.org/en-US/search?q=%(query)s&topic=html",
         "coffee": "https://developer.mozilla.org/en-US/search?q=%(query)s",
         "php": "http://php.net/manual-lookup.php?pattern=%(query)s",
         "clojure": "http://clojuredocs.org/search?x=0&y=0&q=%(query)s",
