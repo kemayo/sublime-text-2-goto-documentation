@@ -17,6 +17,8 @@ default_docs = {
         "php": "http://php.net/manual-lookup.php?pattern=%(query)s",
         "clojure": "http://clojuredocs.org/search?x=0&y=0&q=%(query)s",
         "go": "http://golang.org/search?q=%(query)s",
+        "c": "http://www.cplusplus.com/search.do?q=%(query)s",
+        "cpp": "http://www.cplusplus.com/search.do?q=%(query)s",
         "smarty": "http://www.smarty.net/%(query)s",
         "cmake": "http://cmake.org/cmake/help/v2.8.8/cmake.html#command:%(query)s",
         "perl": "http://perldoc.perl.org/search.html?q=%(query)s",
