@@ -26,6 +26,8 @@ default_docs = {
         "lua": "http://pgl.yoyo.org/luai/i/%(query)s",
         "pgsql": "http://www.postgresql.org/search/?u=%%2Fdocs%%2Fcurrent%%2F&q=%(query)s",
         "erlang": "http://erldocs.com/R16B03/?search=%(query)s",
+        "haskell": "http://hayoo.fh-wedel.de/?query=%(query)s",
+        "scala": "http://scalex.org/?q=%(query)s",
         "css": "http://devdocs.io/#q=%(scope)s+%(query)s",
         "scss": "http://devdocs.io/#q=%(scope)s+%(query)s",
         "less": "http://devdocs.io/#q=%(scope)s+%(query)s",
