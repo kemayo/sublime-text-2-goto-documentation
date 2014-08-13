@@ -53,25 +53,19 @@ class GotoDocumentationCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # grab the word or the selection from the view
         for region in self.view.sel():
+            location = False
             if region.empty():
-
                 # if we have no selection grab the current word
-                word = self.view.word(region)
-                if not word.empty():
-                    q = self.view.substr(word)
-                    scope = self.view.scope_name(word.begin()).rpartition('.')[2].strip()
-
-                    self.open_doc(q, scope)
-
+                location = self.view.word(region)
             else:
-
                 # grab the selection
-                if not region.empty():
-                    q = self.view.substr(region)
-                    scope = self.view.scope_name(region.begin()).rpartition('.')[2]
+                location = region
 
-                    self.open_doc(q, scope)
+            if location and not location.empty():
+                q = self.view.substr(location)
+                scope = self.view.scope_name(location.begin()).rpartition('.')[2].strip()
 
+                self.open_doc(q, scope)
 
     def open_doc(self, query, scope):
 
