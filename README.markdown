@@ -20,6 +20,7 @@ A Sublime Text plugin to jump to documentation for the current keyword.
  * Postgres
  * Erlang
  * Smarty
+ * Haskell
  * ...you can add any other language via settings
 
 
