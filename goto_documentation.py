@@ -7,7 +7,7 @@ import re, os
 import subprocess
 
 default_docs = {
-        "ahk": "http://www.autohotkey.com/docs/commands/%(query)s.htm",
+        "ahk": "http://www.ahkscript.org/docs/commands/%(query)s.htm",
         "rails": "http://api.rubyonrails.org/?q=%(query)s",
         "controller": "http://api.rubyonrails.org/?q=%(query)s",
         "ruby": "http://ruby-doc.com/search.html?q=%(query)s",
